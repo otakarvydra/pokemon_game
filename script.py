@@ -1,6 +1,92 @@
 #Modules import
 from random import randint
 
+#Defining functions used throughout the program
+
+def select_pokemons():
+    pokemons = ['Pikachu', 'Renekton', 'Maokai']
+    pokemon_1 = input('\nPlayer 1, please select a pokemon ')
+    pokemon_2 = input('\nPlayer 2, please select a pokemon ')
+    while not(pokemon_1 in pokemons and pokemon_2 in pokemons):
+        print('\nInvalid pokemon selection')
+        pokemon_1 = input('\nPlayer 1, please select a pokemon ')
+        pokemon_2 = input('\nPlayer 2, please select a pokemon ')
+
+def print_instructions():
+    print(info.instructions)
+
+def print_pokemons():
+    print('\n' + info.pikachu)
+    print('\n' + info.renekton)
+    print('\n' + info.maokai)
+
+
+#Info class definition
+class Info:
+    instructions = '''
+    Welcome to Pokemon game!
+    In this game, you and your opponent will choose a Pokemon our of 4 available Pokemons.
+    The game objective is to defeat the opponents Pokemon. 
+    The first part of each turn is called the upkeep. Here the pokemons regain their health, mana and gain gold.
+    Each Pokemon gets 5 gold in the upkeep, health and mana regen are specific to each pokemon.
+    In the second part, the player can choose only one of the following actions:
+
+    1: Rest
+        The Pokemon rests and regains 10 health.
+
+    2: Shop
+        The Pokemon visits the shop where items that increase the Pokemons attributes can be bought. 
+
+    3: Attack
+        The Pokemon attacks the other Pokemon. Damage dealt is calculated as Attack damage - armor.
+
+    4: Jungle
+        The Pokemon visits the jungle where one of the following scenarios randomly occurs: 
+            1. Rumble ambush: -10 health, -10 gold
+            2. Gold sack:     +15 gold
+            3. Lake:          +20 health
+            4. Meditation:    +1 Health regen, +2 armor
+        As you can see, it is beneficial to visit the jungle. 
+
+    5: Cast a special ability
+        This is specific to every Pokemon, there is one Pokemon that has no ability!
+    '''
+
+    pikachu  = '''
+    Pikachu:
+    Light caster, excels from start, has very high burst potential!
+    health        = 140
+    health_regen  = 8
+    armor         = 5
+    attack_damage = 15
+    mana          = 100
+    mana_regen    = 20
+
+    fireball: Costs 60 mana and deals 40 damage to target Pokemon
+    '''
+    
+    renekton = '''
+    Renekton:
+    Tough figher, has no abilities, uses brute force to win!
+    health        = 150
+    health_regen  = 12
+    armor         = 10
+    attack_damage = 20
+     '''
+    
+    maokai = '''
+    Maokai:
+    Massive creature, that grows overtime until it can not be stopped!
+    health        = 170
+    health_regen  = 10
+    armor         = 50
+    attack_damage = 10
+    mana          = 120
+    mana_regen    = 10
+ 
+    overgrow: Costs 20 mana and Maokai permanently gains 5 health, 1.5 health_regen, 0.5 armor and 0.4 attack_damage
+    '''
+
 #Store class definition
 class Store:
     '''Contains items that can be bought by pokemons'''
@@ -26,13 +112,14 @@ class Pokemon:
         self.mana          = mana
         self.mana_regen    = mana_regen
 
-        self.gold          = 80
+        self.gold          = 15
         self.items         = []
 
     def upkeep(self):
-        '''This method is called by every pokemon at the start of every turn, does not contain mana regen, to include mana_regen, inherit and add to this method'''
-        self.health = self.health + self.health_regen
-        self.gold  += 5
+        '''This method is called by every pokemon at the start of every turn'''
+        self.health += self.health_regen
+        self.mana   += self.mana_regen
+        self.gold   += 5
         
     def attack(self, other_pokemon):
         '''This is an attack method, where the current pokemon attacks other_pokemon, damage dealt is self.attack_damage - other_pokemon.armor'''
@@ -57,7 +144,7 @@ class Pokemon:
             self.health_regen += 1
             self.armor         = 2
         if event == 4:
-            print('You got ambushed by rumble -10 gold, -10 health')
+            print('You got ambushed by rumble -10 health, -10 gold')
             self.gold   -= 10
             self.health -= 10
 
@@ -89,5 +176,48 @@ class Pokemon:
                 loop_input = input('\nWhat item do you wish to buy? y/n ')
             except:
                 print('\nThe desired item does not exist!')
-            
+
+#Pokemons definition            
+class Pikachu(Pokemon):
+    def fireball(self, other_pokemon):
+        mana_cost = 60
+        if self.mana >= mana_cost:
+            other_pokemon.health -= 40
+            print('\nCasted Fireball')
+        else:
+            print('\nNot enough mana!')
+
+class Renekton(Pokemon):
+    pass
+
+class Maokai(Pokemon):
+    def overgrow(self):
+        mana_cost = 20
+        if self.mana >= mana_cost:
+            self.health        += 5
+            self.health_regen  += 1.5
+            self.armor         += 0.5
+            self.attack_damage += 0.4
+
+        else:
+            print('\nNot enough mana!')
+    pass
+
+#Creating Instances
 store = Store()
+info = Info()
+pikachu  = Pikachu(140, 8, 5, 15, 100, 20)
+renekton = Renekton(150, 10, 10, 20)
+maokai = Maokai(170, 10, 5, 10, 120, 10)
+
+#Printing information to players
+print_instructions()
+
+input('\nPress enter to view the separate Pokemons!')
+
+print_pokemons()
+
+#Selecting Pokemons
+select_pokemons()
+
+#GAME ENGINE
